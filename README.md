@@ -1,20 +1,22 @@
-# Flirt AI
+# Flirtly
 
-Eine responsive, deutschsprachige Flirt-KI mit GitHub Pages als Frontend und KDS-AI-Supabase als Backend.
+Flirtly ist ein einfacher, responsiver KI-Chatpartner für natürliches Schreiben, Flirten, ernste Gespräche und erwachsene Dirty-Talk-Szenarien.
 
 ## Funktionen
-- Flirt-Coach, Nachrichtenhilfe, Antwortideen, Date-Vorschläge und Rollenspiel
-- Wählbare Persönlichkeit, Ziel und Gesprächsstil
-- Mobilfreundlicher Chat, Vorschläge, Chat kopieren und lokal gespeicherter Verlauf
+- Automatische Erkennung der Sprache und Antworten in derselben Sprache
+- Kurze, natürliche Antworten statt langer KI-Monologe
+- Modi für natürliches Chatten, Flirten, freche, romantische oder ernste Gespräche, erwachsenen Dirty Talk, Rollenspiel und Coaching
+- Mobilfreundlicher Chat mit lokalem Verlauf, Chat kopieren und neu starten
 - OpenRouter-Anbindung ausschließlich serverseitig über eine Supabase Edge Function
-- Kein API-Key im Frontend
+- Der OpenRouter-Key liegt nicht im Frontend
 
 ## Backend
 Supabase-Projekt: KDS AI (`eopvkwhcgznvubesaszv`).
 
-Die Edge Function `flirt-ai` liest das vorhandene Supabase Secret `flirt_ai`. Als kompatible Alternativen werden `OPENROUTER_API_KEY` und `AI_API_KEY` unterstützt. Optional kann `FLIRT_AI_MODEL` oder `AI_MODEL` gesetzt werden; Standardmodell ist `openrouter/free`.
+Die Edge Function `flirt-ai` liest das vorhandene Supabase Secret `flirt_ai`. Als Alternativen werden `OPENROUTER_API_KEY` und `AI_API_KEY` unterstützt. Optional kann `FLIRT_AI_MODEL` oder `AI_MODEL` gesetzt werden; Standardmodell ist `openrouter/free`.
 
-Der OpenRouter-Key bleibt serverseitig und darf niemals in HTML, JavaScript oder GitHub gespeichert werden.
+Das Secret darf niemals in HTML, JavaScript oder GitHub gespeichert werden. Sexuelle Gespräche sind auf eindeutig einvernehmliche Erwachsene beschränkt.
 
 ## Hosting
-Aktiviere in GitHub unter Settings → Pages die Veröffentlichung aus dem `main`-Branch und dem Root-Verzeichnis. Die Website ist dann unter https://lordlolqdh.github.io/flirt-ai/ erreichbar.
+GitHub Pages veröffentlicht den `main`-Branch aus dem Root-Verzeichnis unter:
+https://lordlolqdh.github.io/flirt-ai/

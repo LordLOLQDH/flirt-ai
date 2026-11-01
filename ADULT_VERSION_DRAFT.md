@@ -9,7 +9,7 @@
 ## Startblocker
 1. Tatsächlichen rechtlichen Betreiber und zustellfähige Anschrift festlegen.
 2. Fachlich/juristisch klären, ob und welche Altersverifikation erforderlich ist.
-3. Eigenes Backend und separate Supabase-Umgebung einrichten. Teen-Endpunkt nicht für Erwachsenen-Inhalte wiederverwenden.
+3. Im bestehenden KDS-AI-Supabase-Projekt (`eopvkwhcgznvubesaszv`) ausschließlich eine eigene Edge Function und getrennte Tabellen/Policies für Flirtly 18+ anlegen. Die Funktion `flirt-ai` für die Teen-Version bleibt unangetastet. Das gemeinsame Projekt ist weniger isoliert als ein eigenes Supabase-Projekt; Berechtigungen und Secrets müssen strikt getrennt bleiben.
 4. Serverseitige Zugriffskontrolle und Inhaltsmoderation umsetzen; eine Checkbox ist leicht umgehbar.
 5. KI-Anbieter, Hosting, Logs, Speicherfristen, Drittlandtransfers und alle weiteren Datenflüsse erfassen.
 6. Cookies und Local Storage auditieren; Consent-Manager nur passend zum tatsächlichen Einsatz integrieren.
@@ -17,4 +17,4 @@
 8. Meldeweg, Löschkonzept und Sicherheits-/Missbrauchsreaktion einrichten.
 9. Sicherstellen, dass die bestehende Teen-Version unverändert und altersgerecht bleibt.
 
-Keine API-Geheimnisse ins Frontend. Ein Git-Branch ist kein Sicherheitsmechanismus und die Alterscheckbox ist keine Altersverifikation.
+Keine API-Geheimnisse ins Frontend. Der Erwachsenen-Chat bleibt deaktiviert, bis eine verantwortliche volljährige Betreiberperson feststeht und die rechtlichen sowie technischen Startbedingungen geprüft sind. Ein Git-Branch ist kein Sicherheitsmechanismus und die Alterscheckbox ist keine Altersverifikation.

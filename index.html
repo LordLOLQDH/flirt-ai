@@ -89,5 +89,6 @@ $("send").onclick=()=>sendMessage();$("input").addEventListener("keydown",e=>{if
 $("newchat").onclick=()=>{if(history.length&&!confirm("Neuen Chat beginnen?"))return;history=[];save();render()};
 $("copyChat").onclick=async()=>{const value=history.map(m=>(m.role==="user"?"Du":"Crushly Teen")+": "+m.content).join("\n\n");if(!value)return toast("Noch kein Chat vorhanden.");try{await navigator.clipboard.writeText(value);toast("Chat kopiert.")}catch{toast("Kopieren nicht verfügbar.")}};
 try{history=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(!Array.isArray(history))history=[]}catch{history=[]}render();
-$("chooseTeen").onclick=()=>{$("modeSelectScreen").style.display="none";$("chatApp").style.display="flex";document.body.style.overflow="";render();};\n$("chooseAdult").onclick=()=>{window.location.href="./adult.html";};
+$("chooseTeen").onclick=()=>{$("modeSelectScreen").style.display="none";$("chatApp").style.display="flex";document.body.style.overflow="";render();};
+$("chooseAdult").onclick=()=>{window.location.href="./adult.html";};
 </script></body></html>

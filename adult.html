@@ -30,6 +30,16 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 <label class="checkline"><input type="checkbox" id="adultConfirm"><span>Ich bestätige, dass ich mindestens 18 Jahre alt bin und die Regeln sowie Datenschutzhinweise gelesen habe.</span></label>
 <button class="primary" id="verifyBtn" disabled>Bestätigen und Alter prüfen&nbsp; →</button>
 <div class="gate-status" id="gateStatus" aria-live="polite"></div>
+<div style="margin:24px 0 12px;border-top:1px solid var(--line)"></div>
+<details>
+<summary style="cursor:pointer;color:#d8b7e2;font-size:13px;font-weight:700">Admin-Zugang</summary>
+<p class="lead" style="font-size:12px;margin:12px 0">Nur für Administration. Das Passwort wird serverseitig bei Supabase geprüft.</p>
+<form id="adminForm" style="display:grid;gap:9px">
+<input id="adminPassword" type="password" autocomplete="current-password" placeholder="Admin-Code" aria-label="Admin-Code" required style="width:100%;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px">
+<button class="secondary" id="adminLoginBtn" type="submit">Admin-Zugang prüfen</button>
+<div class="gate-status" id="adminStatus" aria-live="polite"></div>
+</form>
+</details>
 </section>
 <section id="product">
 <div class="chat">
@@ -44,14 +54,14 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="adult-product-0.1.2";
+const APP_VERSION="adult-product-0.1.3";
 const AGEVERIF_KEY="vLzafhEevJXWUOPX6rrzQBGjrpmUNNfmGMxbetXY";
 const $=id=>document.getElementById(id);
 const confirmBox=$("adultConfirm"),verifyBtn=$("verifyBtn"),gateStatus=$("gateStatus");
-let ageVerified=false,sessionReady=false,busy=false,history=[];
+let ageVerified=false,sessionReady=false,busy=false,history=[],adminToken=null;
 const client=window.supabase.createClient("https://eopvkwhcgznvubesaszv.supabase.co","sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c");
 confirmBox.addEventListener("change",()=>{verifyBtn.disabled=!confirmBox.checked;gateStatus.textContent=""});
-function showProduct(){ageVerified=true;$("gate").style.display="none";$("product").style.display="block";document.querySelector(".tag").textContent="VERIFIZIERT · 18+";startSession();}
+function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display="block";document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();}
 function loadAgeVerif(){
  return new Promise((resolve,reject)=>{
   if(window.ageverif){resolve(window.ageverif);return}
@@ -87,12 +97,22 @@ async function sendMessage(text){
  if(document.querySelector(".welcome"))document.querySelector(".welcome").remove();
  input.value="";input.style.height="auto";addMessage(message,"user");history.push({role:"user",content:message});busy=true;$("sendBtn").disabled=true;input.disabled=true;$("chatStatus").textContent="Flirtly denkt nach …";
  try{
-  const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{message,history:history.slice(-12,-1)},headers:{"x-flirtly-version":APP_VERSION}});
+  const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{message,history:history.slice(-12,-1)},headers:{"x-flirtly-version":APP_VERSION,"x-flirtly-admin-token":adminToken||""}});
   if(error)throw error;if(!data?.ok)throw new Error(data?.error||"Die Anfrage ist fehlgeschlagen.");
   addMessage(String(data.reply),"assistant");history.push({role:"assistant",content:String(data.reply)});history=history.slice(-14);$("chatStatus").textContent="Bereit.";
  }catch(e){$("chatStatus").textContent=e.message||"Verbindung fehlgeschlagen. Bitte erneut versuchen."}
  finally{busy=false;$("sendBtn").disabled=false;input.disabled=false;input.focus()}
 }
+$("adminForm").addEventListener("submit",async e=>{
+ e.preventDefault();const btn=$("adminLoginBtn"),status=$("adminStatus"),password=$("adminPassword").value;
+ if(!password)return;btn.disabled=true;status.textContent="Admin-Code wird serverseitig geprüft …";
+ try{
+  const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{action:"admin_login",password},headers:{"x-flirtly-version":APP_VERSION}});
+  if(error)throw error;if(!data?.ok||!data?.token)throw new Error(data?.error||"Admin-Anmeldung fehlgeschlagen.");
+  adminToken=data.token;password&&($("adminPassword").value="");showProduct(true);
+ }catch(err){status.textContent=err.message||"Admin-Anmeldung fehlgeschlagen."}
+ finally{btn.disabled=false}
+});
 $("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage()});
 $("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
 $("chatInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,125)+"px"});

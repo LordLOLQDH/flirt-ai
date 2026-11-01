@@ -42,11 +42,13 @@ async function checkVersion(manual=false){
   if(!data.version)throw new Error("Ungültige Versionsdatei");
   if(data.version!==APP_VERSION){
    showVersionGate("Update wird geladen","Diese Version ("+APP_VERSION+") ist veraltet. Flirtly lädt Version "+data.version+" und sperrt die alte Oberfläche.");
-   const target=new URL("./",location.href);target.searchParams.set("v",data.version);target.searchParams.set("refresh",String(Date.now()));
-   if(location.search.includes("v="+encodeURIComponent(data.version))){
-    setTimeout(()=>checkVersion(false),1800);
-   }else{
+   const target=new URL("./index.html",location.href);target.searchParams.set("v",data.version);target.searchParams.set("refresh",String(Date.now()));
+   if(new URL(location.href).searchParams.get("forcedVersion")!==data.version){
+    target.searchParams.set("forcedVersion",data.version);
     location.replace(target.href);
+   }else{
+    showVersionGate("Update wird bereitgestellt","Die aktuelle Version ist noch nicht überall angekommen. Flirtly bleibt gesperrt und versucht den neuesten Stand erneut zu laden.");
+    setTimeout(()=>{const retry=new URL("./index.html",location.href);retry.searchParams.set("v",data.version);retry.searchParams.set("refresh",String(Date.now()));retry.searchParams.set("forcedVersion",data.version);location.replace(retry.href)},4000);
    }
    return false;
   }

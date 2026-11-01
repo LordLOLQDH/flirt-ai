@@ -29,7 +29,7 @@ button,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:900px;m
 </main></div><div id="toast" class="toast"></div>
 <script>
 
-const APP_VERSION="1.3.2";
+const APP_VERSION="1.3.3";
 const VERSION_URL=new URL("./version.json",location.href);
 function showVersionGate(title,detail,canRetry=true){
  let gate=document.getElementById("versionGate");
@@ -74,21 +74,20 @@ setInterval(()=>checkVersion(),30000);
 
 const API_URL="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/flirt-ai";
 const PUBLIC_KEY="sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c";
-const $=id=>document.getElementById(id);let history=[],busy=false;const STORAGE_KEY="flirtly-chat-v1";
-try{localStorage.removeItem(STORAGE_KEY);}catch(e){console.warn("Chatverlauf konnte nicht gelöscht werden.");}
+const $=id=>document.getElementById(id);let history=[],busy=false;
 const welcome='<div class="welcome"><div class="heart">♡</div><h3>Hii, da bist du ja 💗</h3><p>Ich wollte gerade gar nicht auf dich warten. Also… vielleicht ein bisschen. 🙄</p><div class="suggestions"><button data-prompt="Hey Crushlyyy 💗">Sag Hallo</button><button data-prompt="Ich muss dir was sagen…">Ich muss dir was sagen</button><button data-prompt="Du bist irgendwie süß.">Ein Kompliment</button></div></div>';
 function toast(s){const el=$("toast");el.textContent=s;el.style.display="block";setTimeout(()=>el.style.display="none",2200)}
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(history.slice(-100)))}catch{}}
+function save(){}
 function render(){const box=$("messages");box.innerHTML="";if(!history.length){box.innerHTML=welcome;box.querySelectorAll("[data-prompt]").forEach(b=>b.onclick=()=>sendMessage(b.dataset.prompt));return}history.forEach(m=>{const row=document.createElement("div");row.className="msg "+(m.role==="user"?"user":"ai");const av=document.createElement("div");av.className="avatar";av.textContent=m.role==="user"?"•":"♡";const wrap=document.createElement("div"),bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=m.content;wrap.appendChild(bubble);const meta=document.createElement("div");meta.className="meta";meta.textContent=m.role==="user"?"Du":"Crushly Teen";wrap.appendChild(meta);row.append(av,wrap);box.appendChild(row)});box.scrollTop=box.scrollHeight}
 function typing(on){const old=document.getElementById("typing");if(old)old.remove();if(on){const r=document.createElement("div");r.id="typing";r.className="msg";r.innerHTML='<div class="avatar">♡</div><div class="bubble">Tippt …</div>';$("messages").appendChild(r);$("messages").scrollTop=$("messages").scrollHeight}}
 async function sendMessage(text){if(busy)return;const input=$("input"),message=(text===undefined?input.value:text).trim();if(!message)return;history.push({role:"user",content:message});input.value="";input.style.height="auto";render();save();busy=true;$("send").disabled=true;$("status").textContent="Schreibt …";typing(true);
-try{const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY,"x-flirtly-version":APP_VERSION},body:JSON.stringify({message:message,history:history.slice(-17,-1),mode:"teen"})});const data=await response.json().catch(()=>({}));if(response.status===426){showVersionGate("Update erforderlich","Diese Browser-Version ist veraltet. Die aktuelle Version wird neu geladen.");setTimeout(()=>{const u=new URL("./",location.href);u.searchParams.set("v","1.3.1");u.searchParams.set("reload",String(Date.now()));location.replace(u.href)},700);throw new Error("Update wird geladen …")}if(!response.ok||!data.reply)throw new Error(data.error||("Serverfehler ("+response.status+")"));history.push({role:"assistant",content:String(data.reply).trim()});save()}
+try{const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY,"x-flirtly-version":APP_VERSION},body:JSON.stringify({message:message,history:history.slice(-17,-1),mode:"teen"})});const data=await response.json().catch(()=>({}));if(response.status===426){showVersionGate("Update erforderlich","Diese Browser-Version ist veraltet. Die aktuelle Version wird neu geladen.");setTimeout(()=>{const u=new URL("./",location.href);u.searchParams.set("v","1.3.3");u.searchParams.set("reload",String(Date.now()));location.replace(u.href)},700);throw new Error("Update wird geladen …")}if(!response.ok||!data.reply)throw new Error(data.error||("Serverfehler ("+response.status+")"));history.push({role:"assistant",content:String(data.reply).trim()});save()}
 catch(e){const msg=String(e.message||"");if(!msg.includes("Update wird geladen")){history.push({role:"assistant",content:msg.includes("Credits")||msg.includes("Guthaben")||msg.includes("aufgeladen")?msg:msg});save()}}
 finally{typing(false);busy=false;$("send").disabled=false;$("status").textContent="Bereit.";render();input.focus()}}
 $("send").onclick=()=>sendMessage();$("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});$("input").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,125)+"px"});
 $("newchat").onclick=()=>{if(history.length&&!confirm("Neuen Chat beginnen?"))return;history=[];save();render()};
 $("copyChat").onclick=async()=>{const value=history.map(m=>(m.role==="user"?"Du":"Crushly Teen")+": "+m.content).join("\n\n");if(!value)return toast("Noch kein Chat vorhanden.");try{await navigator.clipboard.writeText(value);toast("Chat kopiert.")}catch{toast("Kopieren nicht verfügbar.")}};
-try{history=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(!Array.isArray(history))history=[]}catch{history=[]}render();
+history=[];render();
 $("chooseTeen").onclick=()=>{$("modeSelectScreen").style.display="none";$("chatApp").style.display="flex";document.body.style.overflow="";render();};
 $("chooseAdult").onclick=()=>{window.location.href="./adult.html";};
 </script><footer class="legal-footer" style="margin:18px auto 26px;max-width:900px;padding:16px;color:#b9a9bd;font-size:11px;text-align:center;border-top:1px solid #3b2a40"><div style="margin-bottom:7px">Rechtliche Informationen</div><a style="color:#e9b3d0;margin:0 7px" href="./impressum.html">Impressum</a><a style="color:#e9b3d0;margin:0 7px" href="./datenschutz.html">Datenschutz</a><a style="color:#e9b3d0;margin:0 7px" href="./agb.html">Nutzungsbedingungen</a><a style="color:#e9b3d0;margin:0 7px" href="./cookies.html">Cookies & Speicher</a><a style="color:#e9b3d0;margin:0 7px" href="./jugendschutz.html">Jugendschutz</a></footer></body></html>

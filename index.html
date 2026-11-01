@@ -20,7 +20,7 @@ button,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:900px;m
 </style>
 </head>
 <body><section class="mode-screen" id="modeSelectScreen"><div class="mode-wrap"><div class="mode-brand">♡ Dein Chat, dein Gefühl</div><h1>Wen möchtest du kennenlernen?</h1><p class="mode-sub">Wähle zuerst deinen Modus. Flirtly 18+ ist ein separater, nicht-sexueller Testchat mit vorgeschalteter Altersbestätigung.</p><div class="mode-cards"><button class="mode-card active" id="chooseTeen"><span class="mode-emoji">💗</span><h2>Crushly Teen</h2><p>Süß, frech, schüchtern und manchmal herrlich verlegen. Ein altersgerechter Chat mit Herzklopfen.</p><span class="mode-cta">Teen Mode starten →</span></button><button class="mode-card active" id="chooseAdult"><span class="mode-emoji">🌙</span><h2>Flirtly 18+</h2><p>Ein separater Testchat für normale Gespräche, Kennenlernen und harmlose Flirt-Themen. Nicht sexuell.</p><span class="mode-cta">18+ öffnen →</span></button></div><p class="mode-note">Crushly Teen bleibt altersgerecht. Flirtly 18+ ist hier nur ein nicht-sexueller Testchat. Die Checkbox dort ist kein verlässlicher Altersnachweis.</p></div></section><div class="app" id="chatApp">
-<header class="top"><div class="brand"><div class="logo">♡</div><div><h1>Crushly Teen</h1><p>Dein süß-frecher Chat-Crush</p></div></div><div class="tag">Version 1.3.1</div></header>
+<header class="top"><div class="brand"><div class="logo">♡</div><div><h1>Crushly Teen</h1><p>Dein süß-frecher Chat-Crush</p></div></div><div class="tag">Version 1.3.2</div></header>
 <main class="chat">
 <div class="chathead"><div><h2 id="chatTitle">Dein Crush-Chat</h2><p>Süß, frech, schüchtern und manchmal maximal verlegen.</p></div><div class="headactions"><button class="smallbtn" id="copyChat">Kopieren</button><button class="smallbtn" id="newchat">Neuer Chat</button></div></div>
 <div class="controls"><span class="tag">💗 Crushly Teen · altersgerechter Flirt</span></div>
@@ -29,7 +29,7 @@ button,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:900px;m
 </main></div><div id="toast" class="toast"></div>
 <script>
 
-const APP_VERSION="1.3.1";
+const APP_VERSION="1.3.2";
 const VERSION_URL=new URL("./version.json",location.href);
 function showVersionGate(title,detail,canRetry=true){
  let gate=document.getElementById("versionGate");
@@ -91,4 +91,4 @@ $("copyChat").onclick=async()=>{const value=history.map(m=>(m.role==="user"?"Du"
 try{history=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(!Array.isArray(history))history=[]}catch{history=[]}render();
 $("chooseTeen").onclick=()=>{$("modeSelectScreen").style.display="none";$("chatApp").style.display="flex";document.body.style.overflow="";render();};
 $("chooseAdult").onclick=()=>{window.location.href="./adult.html";};
-</script></body></html>
+</script><footer class="legal-footer" style="margin:18px auto 26px;max-width:900px;padding:16px;color:#b9a9bd;font-size:11px;text-align:center;border-top:1px solid #3b2a40"><div style="margin-bottom:7px">Rechtliche Informationen</div><a style="color:#e9b3d0;margin:0 7px" href="./impressum.html">Impressum</a><a style="color:#e9b3d0;margin:0 7px" href="./datenschutz.html">Datenschutz</a><a style="color:#e9b3d0;margin:0 7px" href="./agb.html">Nutzungsbedingungen</a><a style="color:#e9b3d0;margin:0 7px" href="./cookies.html">Cookies & Speicher</a><a style="color:#e9b3d0;margin:0 7px" href="./jugendschutz.html">Jugendschutz</a></footer></body></html>

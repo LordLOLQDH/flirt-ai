@@ -2,8 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#100a12"><meta name="description" content="Flirtly hilft dir, natürlich zu schreiben, zu flirten und Gespräche zu führen."><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>Flirtly · Dein KI-Chatpartner</title>
+<meta name="theme-color" content="#100a12"><meta name="description" content="Crushly Teen: süß, frech, schüchtern und ein bisschen peinlich."><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>Crushly Teen · Dein Chat</title>
 <style>
 :root{color-scheme:dark;--bg:#100a12;--panel:#19121d;--panel2:#251a2b;--pink:#ff5b9a;--purple:#b46aff;--text:#fff7fb;--muted:#b9a9bd;--line:#3b2a40}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 10% 0%,#3c1835,transparent 38%),radial-gradient(ellipse at 90% 100%,#251544,transparent 38%),var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
@@ -13,19 +13,23 @@ button,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:900px;m
 @media(max-width:600px){.app{padding:8px}.top{padding:4px 3px 11px}.brand h1{font-size:20px}.tag{font-size:10px}.chat{min-height:calc(100vh - 76px);border-radius:19px}.chathead{padding:12px}.messages{padding:14px;min-height:300px;max-height:none}.msg{max-width:97%}.welcome h3{font-size:22px}.controls{padding:10px 12px}.controls select{min-width:0;width:100%;flex:none}.controls label{width:100%}.composer{padding:9px}.foot{font-size:9px}}
 
 #versionGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:#100a12;color:#fff7fb;text-align:center;font:16px/1.5 system-ui,-apple-system,sans-serif}#versionGate>div{max-width:360px}#versionGate h2{margin:0 0 10px}#versionGate p{color:#b9a9bd}#versionGate button{background:#ff5b9a;border:0;border-radius:12px;padding:11px 16px;font-weight:700;color:#210d20}
+
+.mode-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at 15% 10%,#5c254b,transparent 42%),radial-gradient(ellipse at 90% 90%,#32205e,transparent 42%),#100a12}
+.mode-wrap{width:min(100%,760px);text-align:center}.mode-brand{font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#f4a7d0;font-weight:800}.mode-wrap h1{font-size:clamp(34px,7vw,54px);line-height:1.05;letter-spacing:-1.8px;margin:12px 0}.mode-sub{max-width:480px;margin:0 auto 28px;color:#d8c6dc;font-size:15px}.mode-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;text-align:left}.mode-card{position:relative;min-height:220px;padding:23px;border-radius:24px;border:1px solid #65405f;background:linear-gradient(145deg,#2b1830,#1a1221);color:#fff7fb;display:flex;flex-direction:column;align-items:flex-start;box-shadow:0 18px 45px #0003}.mode-card.active{border-color:#ff79b7;background:linear-gradient(145deg,#512346,#25152d);cursor:pointer;transition:transform .18s,border-color .18s}.mode-card.active:hover{transform:translateY(-3px);border-color:#ffc0df}.mode-card:disabled{cursor:not-allowed;opacity:.72}.mode-emoji{font-size:34px;margin-bottom:16px}.mode-card h2{font-size:23px;margin:0 0 8px}.mode-card p{font-size:13px;color:#d4c2d8;margin:0 0 18px}.mode-cta{margin-top:auto;padding:10px 14px;border-radius:12px;background:#ff8ec3;color:#2b1024;font-size:13px;font-weight:800}.mode-card.soon .mode-cta{background:#332538;color:#d9c7dd;border:1px solid #604762}.mode-note{font-size:11px;color:#9e8ba5;margin:20px auto 0;max-width:450px}.app{display:none}
+@media(max-width:560px){.mode-screen{padding:18px}.mode-cards{grid-template-columns:1fr}.mode-card{min-height:180px;padding:19px}.mode-emoji{margin-bottom:8px}.mode-wrap h1{font-size:36px}}
 </style>
 </head>
-<body><div class="app">
-<header class="top"><div class="brand"><div class="logo">♡</div><div><h1>Flirtly</h1><p>Dein persönlicher KI-Chatpartner</p></div></div><div class="tag">Version 1.2.1</div></header>
+<body><section class="mode-screen" id="modeSelectScreen"><div class="mode-wrap"><div class="mode-brand">♡ Dein Chat, dein Gefühl</div><h1>Wen möchtest du kennenlernen?</h1><p class="mode-sub">Wähle zuerst deinen Modus. Der Erwachsenenmodus ist noch in Arbeit und bleibt vorerst geschlossen.</p><div class="mode-cards"><button class="mode-card active" id="chooseTeen"><span class="mode-emoji">💗</span><h2>Crushly Teen</h2><p>Süß, frech, schüchtern und manchmal herrlich verlegen. Ein altersgerechter Chat mit Herzklopfen.</p><span class="mode-cta">Teen Mode starten →</span></button><button class="mode-card soon" id="chooseAdult" disabled aria-disabled="true"><span class="mode-emoji">🌙</span><h2>Erwachsenenmodus</h2><p>Ein eigener Modus mit eigener Persönlichkeit. Wir arbeiten noch daran.</p><span class="mode-cta">Kommt bald</span></button></div><p class="mode-note">Crushly Teen bleibt altersgerecht und nicht sexuell. Der Erwachsenenmodus wird separat entwickelt.</p></div></section><div class="app" id="chatApp">
+<header class="top"><div class="brand"><div class="logo">♡</div><div><h1>Crushly Teen</h1><p>Dein süß-frecher Chat-Crush</p></div></div><div class="tag">Version 1.3.0</div></header>
 <main class="chat">
-<div class="chathead"><div><h2 id="chatTitle">Dein Gespräch</h2><p>Natürlich schreiben. Echt reagieren.</p></div><div class="headactions"><button class="smallbtn" id="copyChat">Kopieren</button><button class="smallbtn" id="newchat">Neuer Chat</button></div></div>
-<div class="controls"><label for="mode">Gesprächsstil</label><select id="mode"><option value="natural">Natürlich & locker</option><option value="flirty">Flirty & verspielt</option><option value="bold">Frech & selbstbewusst</option><option value="romantic">Romantisch</option><option value="serious">Ernst & einfühlsam</option><option value="dirty">Dirty Talk · 18+</option><option value="roleplay">Realistisches Rollenspiel</option><option value="coach">Flirt-Coach</option></select></div>
+<div class="chathead"><div><h2 id="chatTitle">Dein Crush-Chat</h2><p>Süß, frech, schüchtern und manchmal maximal verlegen.</p></div><div class="headactions"><button class="smallbtn" id="copyChat">Kopieren</button><button class="smallbtn" id="newchat">Neuer Chat</button></div></div>
+<div class="controls"><span class="tag">💗 Crushly Teen · altersgerechter Flirt</span></div>
 <div id="messages" class="messages"></div>
 <div class="composer"><div class="composebox"><textarea id="input" rows="1" maxlength="4000" placeholder="Nachricht schreiben …"></textarea><button id="send" class="send" aria-label="Senden">↑</button></div><div class="foot"><span id="status">Bereit.</span><span>Sprache automatisch erkannt · kurze, natürliche Antworten</span></div></div>
 </main></div><div id="toast" class="toast"></div>
 <script>
 
-const APP_VERSION="1.2.1";
+const APP_VERSION="1.3.0";
 const VERSION_URL=new URL("./version.json",location.href);
 function showVersionGate(title,detail,canRetry=true){
  let gate=document.getElementById("versionGate");
@@ -41,13 +45,13 @@ async function checkVersion(manual=false){
   const data=await r.json();
   if(!data.version)throw new Error("Ungültige Versionsdatei");
   if(data.version!==APP_VERSION){
-   showVersionGate("Update wird geladen","Diese Version ("+APP_VERSION+") ist veraltet. Flirtly lädt Version "+data.version+" und sperrt die alte Oberfläche.");
+   showVersionGate("Update wird geladen","Diese Version ("+APP_VERSION+") ist veraltet. Crushly Teen lädt Version "+data.version+" und sperrt die alte Oberfläche.");
    const target=new URL("./index.html",location.href);target.searchParams.set("v",data.version);target.searchParams.set("refresh",String(Date.now()));
    if(new URL(location.href).searchParams.get("forcedVersion")!==data.version){
     target.searchParams.set("forcedVersion",data.version);
     location.replace(target.href);
    }else{
-    showVersionGate("Update wird bereitgestellt","Die aktuelle Version ist noch nicht überall angekommen. Flirtly bleibt gesperrt und versucht den neuesten Stand erneut zu laden.");
+    showVersionGate("Update wird bereitgestellt","Die aktuelle Version ist noch nicht überall angekommen. Crushly Teen bleibt gesperrt und versucht den neuesten Stand erneut zu laden.");
     setTimeout(()=>{const retry=new URL("./index.html",location.href);retry.searchParams.set("v",data.version);retry.searchParams.set("refresh",String(Date.now()));retry.searchParams.set("forcedVersion",data.version);location.replace(retry.href)},4000);
    }
    return false;
@@ -56,13 +60,13 @@ async function checkVersion(manual=false){
   document.body.style.overflow="";
   return true;
  }catch(e){
-  showVersionGate("Version wird geprüft","Flirtly kann die aktuelle Version gerade nicht bestätigen. Der Chat bleibt gesperrt, bis die Prüfung erfolgreich ist.");
+  showVersionGate("Version wird geprüft","Crushly Teen kann die aktuelle Version gerade nicht bestätigen. Der Chat bleibt gesperrt, bis die Prüfung erfolgreich ist.");
   setTimeout(()=>checkVersion(false),5000);
   return false;
  }
 }
 document.body.style.overflow="hidden";
-showVersionGate("Flirtly wird geprüft","Aktuelle Version wird geladen. Einen Moment bitte.");
+showVersionGate("Crushly Teen wird geprüft","Aktuelle Version wird geladen. Einen Moment bitte.");
 checkVersion();
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkVersion()});
 window.addEventListener("pageshow",()=>checkVersion());
@@ -71,17 +75,18 @@ setInterval(()=>checkVersion(),30000);
 const API_URL="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/flirt-ai";
 const PUBLIC_KEY="sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c";
 const $=id=>document.getElementById(id);let history=[],busy=false;const STORAGE_KEY="flirtly-chat-v1";
-const welcome='<div class="welcome"><div class="heart">♡</div><h3>Hi, ich bin Flirtly.</h3><p>Ein lockerer Chat, echte Reaktionen und Flirten ohne peinliche Standardtexte. Stell den Stil ein und leg los.</p><div class="suggestions"><button data-prompt="Schreib mir eine natürliche erste Nachricht.">Erste Nachricht</button><button data-prompt="Gib mir eine charmante, aber nicht kitschige Antwort auf: Hey, was geht?">Antwort formulieren</button><button data-prompt="Lass uns ein realistisches Flirtgespräch üben. Fang du an.">Flirt üben</button><button data-prompt="Ich möchte einfach ehrlich über meine Gefühle reden.">Ernst reden</button></div></div>';
+const welcome='<div class="welcome"><div class="heart">♡</div><h3>Hii, da bist du ja 💗</h3><p>Ich wollte gerade gar nicht auf dich warten. Also… vielleicht ein bisschen. 🙄</p><div class="suggestions"><button data-prompt="Hey Crushlyyy 💗">Sag Hallo</button><button data-prompt="Ich muss dir was sagen…">Ich muss dir was sagen</button><button data-prompt="Du bist irgendwie süß.">Ein Kompliment</button></div></div>';
 function toast(s){const el=$("toast");el.textContent=s;el.style.display="block";setTimeout(()=>el.style.display="none",2200)}
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(history.slice(-100)))}catch{}}
-function render(){const box=$("messages");box.innerHTML="";if(!history.length){box.innerHTML=welcome;box.querySelectorAll("[data-prompt]").forEach(b=>b.onclick=()=>sendMessage(b.dataset.prompt));return}history.forEach(m=>{const row=document.createElement("div");row.className="msg "+(m.role==="user"?"user":"ai");const av=document.createElement("div");av.className="avatar";av.textContent=m.role==="user"?"•":"♡";const wrap=document.createElement("div"),bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=m.content;wrap.appendChild(bubble);const meta=document.createElement("div");meta.className="meta";meta.textContent=m.role==="user"?"Du":"Flirtly";wrap.appendChild(meta);row.append(av,wrap);box.appendChild(row)});box.scrollTop=box.scrollHeight}
+function render(){const box=$("messages");box.innerHTML="";if(!history.length){box.innerHTML=welcome;box.querySelectorAll("[data-prompt]").forEach(b=>b.onclick=()=>sendMessage(b.dataset.prompt));return}history.forEach(m=>{const row=document.createElement("div");row.className="msg "+(m.role==="user"?"user":"ai");const av=document.createElement("div");av.className="avatar";av.textContent=m.role==="user"?"•":"♡";const wrap=document.createElement("div"),bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=m.content;wrap.appendChild(bubble);const meta=document.createElement("div");meta.className="meta";meta.textContent=m.role==="user"?"Du":"Crushly Teen";wrap.appendChild(meta);row.append(av,wrap);box.appendChild(row)});box.scrollTop=box.scrollHeight}
 function typing(on){const old=document.getElementById("typing");if(old)old.remove();if(on){const r=document.createElement("div");r.id="typing";r.className="msg";r.innerHTML='<div class="avatar">♡</div><div class="bubble">Tippt …</div>';$("messages").appendChild(r);$("messages").scrollTop=$("messages").scrollHeight}}
 async function sendMessage(text){if(busy)return;const input=$("input"),message=(text===undefined?input.value:text).trim();if(!message)return;history.push({role:"user",content:message});input.value="";input.style.height="auto";render();save();busy=true;$("send").disabled=true;$("status").textContent="Schreibt …";typing(true);
-try{const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY,"X-Flirtly-Version":APP_VERSION},body:JSON.stringify({message:message,history:history.slice(-17,-1),mode:$("mode").value})});const data=await response.json().catch(()=>({}));if(response.status===426){showVersionGate("Update erforderlich","Diese Browser-Version ist veraltet. Die aktuelle Version wird neu geladen.");setTimeout(()=>{const u=new URL("./",location.href);u.searchParams.set("v","1.2.1");u.searchParams.set("reload",String(Date.now()));location.replace(u.href)},700);throw new Error("Update wird geladen …")}if(!response.ok||!data.reply)throw new Error(data.error||("Serverfehler ("+response.status+")"));history.push({role:"assistant",content:String(data.reply).trim()});save()}
+try{const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY,"X-Crushly Teen-Version":APP_VERSION},body:JSON.stringify({message:message,history:history.slice(-17,-1),mode:"teen"})});const data=await response.json().catch(()=>({}));if(response.status===426){showVersionGate("Update erforderlich","Diese Browser-Version ist veraltet. Die aktuelle Version wird neu geladen.");setTimeout(()=>{const u=new URL("./",location.href);u.searchParams.set("v","1.3.0");u.searchParams.set("reload",String(Date.now()));location.replace(u.href)},700);throw new Error("Update wird geladen …")}if(!response.ok||!data.reply)throw new Error(data.error||("Serverfehler ("+response.status+")"));history.push({role:"assistant",content:String(data.reply).trim()});save()}
 catch(e){const msg=String(e.message||"");if(!msg.includes("Update wird geladen")){history.push({role:"assistant",content:msg.includes("Credits")||msg.includes("Guthaben")||msg.includes("aufgeladen")?msg:msg});save()}}
 finally{typing(false);busy=false;$("send").disabled=false;$("status").textContent="Bereit.";render();input.focus()}}
 $("send").onclick=()=>sendMessage();$("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});$("input").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,125)+"px"});
 $("newchat").onclick=()=>{if(history.length&&!confirm("Neuen Chat beginnen?"))return;history=[];save();render()};
-$("copyChat").onclick=async()=>{const value=history.map(m=>(m.role==="user"?"Du":"Flirtly")+": "+m.content).join("\n\n");if(!value)return toast("Noch kein Chat vorhanden.");try{await navigator.clipboard.writeText(value);toast("Chat kopiert.")}catch{toast("Kopieren nicht verfügbar.")}};
+$("copyChat").onclick=async()=>{const value=history.map(m=>(m.role==="user"?"Du":"Crushly Teen")+": "+m.content).join("\n\n");if(!value)return toast("Noch kein Chat vorhanden.");try{await navigator.clipboard.writeText(value);toast("Chat kopiert.")}catch{toast("Kopieren nicht verfügbar.")}};
 try{history=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(!Array.isArray(history))history=[]}catch{history=[]}render();
+$("chooseTeen").onclick=()=>{$("modeSelectScreen").style.display="none";$("chatApp").style.display="flex";document.body.style.overflow="";render();};
 </script></body></html>

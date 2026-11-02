@@ -100,7 +100,7 @@ async function sendMessage(text){
   const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{message,history:history.slice(-12,-1)},headers:{"x-flirtly-version":APP_VERSION,"x-flirtly-admin-token":adminToken||""}});
   if(error)throw error;if(!data?.ok)throw new Error(data?.error||"Die Anfrage ist fehlgeschlagen.");
   addMessage(String(data.reply),"assistant");history.push({role:"assistant",content:String(data.reply)});history=history.slice(-14);$("chatStatus").textContent="Bereit.";
- }catch(e){$("chatStatus").textContent=e.message||"Verbindung fehlgeschlagen. Bitte erneut versuchen."}
+ }catch(e){let detail=e?.message||"Verbindung fehlgeschlagen. Bitte erneut versuchen.";try{const response=e?.context;if(response&&typeof response.json==="function"){const payload=await response.json();if(payload?.error)detail=payload.error;else if(payload?.message)detail=payload.message;}}catch{}$("chatStatus").textContent=detail}
  finally{busy=false;$("sendBtn").disabled=false;input.disabled=false;input.focus()}
 }
 $("adminForm").addEventListener("submit",async e=>{
@@ -110,7 +110,7 @@ $("adminForm").addEventListener("submit",async e=>{
   const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{action:"admin_login",password},headers:{"x-flirtly-version":APP_VERSION}});
   if(error)throw error;if(!data?.ok||!data?.token)throw new Error(data?.error||"Admin-Anmeldung fehlgeschlagen.");
   adminToken=data.token;password&&($("adminPassword").value="");showProduct(true);
- }catch(err){status.textContent=err.message||"Admin-Anmeldung fehlgeschlagen."}
+ }catch(err){let detail=err?.message||"Admin-Anmeldung fehlgeschlagen.";try{const response=err?.context;if(response&&typeof response.json==="function"){const payload=await response.json();if(payload?.error)detail=payload.error;else if(payload?.message)detail=payload.message;}}catch{}status.textContent=detail}
  finally{btn.disabled=false}
 });
 $("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage()});

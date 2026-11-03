@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flirtly · Administration</title>
+<style>
+:root{color-scheme:dark;--bg:#100b13;--panel:#1d1421;--line:#49334c;--text:#fff7fc;--muted:#c5b4c9;--pink:#f18ab9}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#38203e,#100b13 55%);color:var(--text);font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column}
+main{width:min(900px,calc(100% - 28px));margin:55px auto 40px;flex:1}.eyebrow{color:var(--pink);font-size:11px;letter-spacing:.16em;text-transform:uppercase}h1{font-size:clamp(30px,7vw,46px);margin:10px 0}p{color:var(--muted);line-height:1.55}
+.card{background:#1d1421eF;border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 20px 70px #0005}
+input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#100b13;color:white;font:inherit;margin:7px 0 12px}
+button{border:0;border-radius:12px;padding:13px 17px;font:inherit;font-weight:700;cursor:pointer;background:linear-gradient(110deg,#ff9acb,#c95b9a);color:#210d1b}button.secondary{background:#302237;color:#fff;border:1px solid var(--line)}button:disabled{opacity:.5}
+.status{min-height:24px;color:#f4b9d4;font-size:13px;margin-top:10px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0}.tile{background:#261b2b;border:1px solid var(--line);border-radius:13px;padding:15px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0}.muted{color:var(--muted);font-size:12px}
+footer{padding:22px 14px 28px;text-align:center;border-top:1px solid #49334c;color:#b9a9bd;font-size:12px}footer a{color:#e9b3d0;text-decoration:none;margin:0 7px;display:inline-block;line-height:2}
+</style>
+</head>
+<body>
+<main><div class="eyebrow">Flirtly · Interner Bereich</div><h1>Administration</h1><p>Verwaltung der Zugänge und technische Statusprüfung.</p>
+<section class="card" id="loginCard"><h2>Admin-Anmeldung</h2><form id="loginForm"><label for="adminPassword">Admin-Passwort</label><input id="adminPassword" type="password" autocomplete="current-password" required><button id="loginButton" type="submit">Anmelden</button></form><div class="status" id="loginStatus" aria-live="polite"></div></section>
+<section class="card" id="panel" hidden>
+<div class="row"><div><div class="eyebrow">Geschützte Konsole</div><h2>Admin-Dashboard</h2></div><button class="secondary" id="logoutButton">Abmelden</button></div>
+<div class="grid"><div class="tile"><b>Produktversion</b><div class="muted">admin-panel-1.0.0</div></div><div class="tile"><b>OpenAI API</b><div class="muted" id="openaiStatus">Noch nicht getestet</div></div></div>
+<h3>Zugangscode erstellen</h3><form id="createForm" class="row"><input id="accessName" maxlength="60" required placeholder="Name der Person" style="flex:1;min-width:190px"><button id="createButton">Sechsstelligen Code erstellen</button></form>
+<div id="newCode" class="tile" hidden><div class="muted">Neuer Zugangscode · jetzt kopieren</div><div id="codeDigits" style="font-size:32px;letter-spacing:9px;font-weight:800;margin:9px 0"></div><button class="secondary" id="copyCode">Code kopieren</button></div>
+<div class="row" style="margin-top:24px"><h3>Bestehende Zugänge</h3><button class="secondary" id="reloadCodes">Aktualisieren</button></div><div id="accessList" class="muted">Zugänge werden geladen …</div>
+<button class="secondary" id="testOpenAI" style="margin-top:20px">OpenAI-Verbindung testen</button><div class="status" id="panelStatus" aria-live="polite"></div>
+</section></main>
+<footer><div style="margin-bottom:6px">Rechtliche Informationen</div><a href="./impressum.html">Impressum</a><a href="./datenschutz.html">Datenschutz</a><a href="./agb.html">Nutzungsbedingungen</a><a href="./cookies.html">Cookies & Speicher</a><a href="./jugendschutz.html">Jugendschutz</a><br><a href="./index.html">← Zur Crushly-Startseite</a> <a href="./adult.html">Zur 18+-Startseite</a> <span>© Flirtly</span></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const APP_VERSION="admin-panel-1.0.0",client=window.supabase.createClient("https://eopvkwhcgznvubesaszv.supabase.co","sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c"),$=id=>document.getElementById(id);
+let adminToken=sessionStorage.getItem("flirtly_admin_token")||"";
+async function invoke(body,token=adminToken){const {data,error}=await client.functions.invoke("flirtly-chat-test",{body,headers:{"x-flirtly-version":"adult-product-0.2.0",...(token?{"x-flirtly-admin-token":token}:{})}});if(error)throw error;if(!data?.ok)throw new Error(data?.error||"Anfrage fehlgeschlagen.");return data}
+function showPanel(){ $("loginCard").hidden=true;$("panel").hidden=false;loadCodes()}
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("loginButton");b.disabled=true;$("loginStatus").textContent="Prüfe Admin-Zugang …";try{const d=await invoke({action:"admin_login",password:$("adminPassword").value},"");adminToken=d.token;sessionStorage.setItem("flirtly_admin_token",adminToken);$("adminPassword").value="";showPanel()}catch(err){$("loginStatus").textContent=err.message}finally{b.disabled=false}});
+async function loadCodes(){ $("accessList").textContent="Lade …";try{const d=await invoke({action:"access_list"});$("accessList").replaceChildren();if(!d.accessCodes.length){$("accessList").textContent="Noch keine Zugänge vorhanden.";return}for(const item of d.accessCodes){const row=document.createElement("div");row.className="access-row";const label=document.createElement("span");label.textContent=item.display_name+" · "+(item.active?"Aktiv":"Deaktiviert");const btn=document.createElement("button");btn.className="secondary";btn.textContent=item.active?"Deaktivieren":"Aktivieren";btn.addEventListener("click",async()=>{try{await invoke({action:"access_toggle",id:item.id,active:!item.active});loadCodes()}catch(e){$("panelStatus").textContent=e.message}});row.append(label,btn);$("accessList").append(row)}}catch(e){$("accessList").textContent=e.message}}
+$("createForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("createButton");b.disabled=true;try{const d=await invoke({action:"access_create",name:$("accessName").value.trim()});$("codeDigits").textContent=d.code;$("newCode").hidden=false;$("accessName").value="";$("panelStatus").textContent="Zugang angelegt. Der Code wird nur einmal vollständig angezeigt.";loadCodes()}catch(err){$("panelStatus").textContent=err.message}finally{b.disabled=false}});
+$("copyCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("codeDigits").textContent);$("panelStatus").textContent="Code kopiert."}catch{$("panelStatus").textContent="Kopieren nicht verfügbar."}});
+$("reloadCodes").addEventListener("click",loadCodes);
+$("testOpenAI").addEventListener("click",async()=>{const b=$("testOpenAI");b.disabled=true;$("openaiStatus").textContent="Teste …";try{const d=await invoke({action:"openai_test"});$("openaiStatus").textContent=d.ok?"Verbunden · "+d.model:"Fehler: "+d.error;$("panelStatus").textContent=d.ok?"OpenAI-Verbindung erfolgreich.":d.error}catch(e){$("openaiStatus").textContent=e.message;$("panelStatus").textContent=e.message}finally{b.disabled=false}});
+$("logoutButton").addEventListener("click",()=>{adminToken="";sessionStorage.removeItem("flirtly_admin_token");$("panel").hidden=true;$("loginCard").hidden=false;$("loginStatus").textContent="Abgemeldet."});
+if(adminToken)showPanel();
+</script></body></html>

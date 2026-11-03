@@ -41,4 +41,5 @@ $("reloadCodes").addEventListener("click",loadCodes);
 
 $("logoutButton").addEventListener("click",()=>{adminToken="";sessionStorage.removeItem("flirtly_admin_token");$("panel").hidden=true;$("loginCard").hidden=false;$("loginStatus").textContent="Abgemeldet."});
 if(adminToken)showPanel();
-</script></body></html>
+</script><script src="./consent.js" defer></script>
+</body></html>

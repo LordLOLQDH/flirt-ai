@@ -1,22 +1,42 @@
 # Flirtly
 
-Flirtly ist ein einfacher, responsiver KI-Chatpartner für natürliches Schreiben, Flirten, ernste Gespräche und erwachsene Dirty-Talk-Szenarien.
+Flirtly ist eine KI-Chat-Anwendung für natürliche Gespräche. Je nach Bereich stehen unterschiedliche Gesprächsarten und Funktionen zur Verfügung.
 
-## Funktionen
-- Automatische Erkennung der Sprache und Antworten in derselben Sprache
-- Kurze, natürliche Antworten statt langer KI-Monologe
-- Modi für natürliches Chatten, Flirten, freche, romantische oder ernste Gespräche, erwachsenen Dirty Talk, Rollenspiel und Coaching
-- Mobilfreundlicher Chat mit lokalem Verlauf, Chat kopieren und neu starten
-- OpenRouter-Anbindung ausschließlich serverseitig über eine Supabase Edge Function
-- Der OpenRouter-Key liegt nicht im Frontend
+## Was Flirtly kann
 
-## Backend
-Supabase-Projekt: KDS AI (`eopvkwhcgznvubesaszv`).
+- Natürlich chatten und Fragen stellen
+- In verschiedenen Gesprächsstilen schreiben, zum Beispiel locker, freundlich, romantisch oder ernst
+- Rollenspiele und kreative Gespräche führen
+- Die Sprache der Unterhaltung automatisch erkennen und passend antworten
+- Den Chatverlauf während der Nutzung anzeigen
+- Antworten kopieren und einen neuen Chat starten
+- Auf Smartphones, Tablets und Computern genutzt werden
 
-Die Edge Function `flirt-ai` liest das vorhandene Supabase Secret `flirt_ai`. Als Alternativen werden `OPENROUTER_API_KEY` und `AI_API_KEY` unterstützt. Optional kann `FLIRT_AI_MODEL` oder `AI_MODEL` gesetzt werden; Standardmodell ist `openrouter/free`.
+## So benutzt du Flirtly
 
-Das Secret darf niemals in HTML, JavaScript oder GitHub gespeichert werden. Sexuelle Gespräche sind auf eindeutig einvernehmliche Erwachsene beschränkt.
+1. Öffne die Flirtly-Website.
+2. Wähle den gewünschten Bereich.
+3. Gib den sechsstelligen Zugangscode ein, den du erhalten hast.
+4. Schreibe deine Nachricht in das Chatfeld und sende sie ab.
+5. Nutze die Schaltflächen im Chat, um Antworten zu kopieren oder eine Unterhaltung neu zu beginnen.
 
-## Hosting
-GitHub Pages veröffentlicht den `main`-Branch aus dem Root-Verzeichnis unter:
+Falls du keinen gültigen Zugangscode hast, kannst du den geschützten Bereich nicht öffnen. Gib deinen persönlichen Zugangscode nicht an andere weiter.
+
+## Was du beachten solltest
+
+- Flirtly ist eine KI und kein echter Mensch. Antworten können falsch, unvollständig oder missverständlich sein.
+- Teile keine Passwörter, Zahlungsdaten, Adressen oder andere vertrauliche Informationen im Chat.
+- Verwende die Antworten nicht als Ersatz für medizinische, psychologische, rechtliche oder andere professionelle Beratung.
+- Bleibe respektvoll und nutze den Dienst nicht für Belästigung, Drohungen oder rechtswidrige Inhalte.
+- Der Chatverlauf kann lokal im Browser gespeichert sein. Auf einem anderen Gerät oder nach dem Löschen der Browserdaten ist er möglicherweise nicht mehr verfügbar.
+- Die Verfügbarkeit einzelner Funktionen kann sich ändern oder zeitweise eingeschränkt sein.
+
+## Alters- und Inhaltsregeln
+
+Der Teen-Bereich ist altersgerecht und nicht-sexuell zu verwenden. Inhalte für Erwachsene gehören ausschließlich in den dafür vorgesehenen, altersbeschränkten Bereich. Alterskontrollen und Zugangsbeschränkungen dürfen nicht umgangen werden.
+
+## Website
+
+Flirtly ist über GitHub Pages erreichbar:
+
 https://lordlolqdh.github.io/flirt-ai/

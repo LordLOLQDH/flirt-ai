@@ -88,7 +88,7 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 </div>
 </section>
 </main>
-<footer class="legal"><button type="button" id="copyrightAdmin" style="background:none;border:0;color:inherit;padding:0;font:inherit;cursor:pointer">© Flirtly</button> · Respekt und gegenseitige Zustimmung stehen an erster Stelle.<br><a href="adult-agb.html">AGB</a><a href="adult-datenschutz.html">Datenschutz</a><a href="adult-impressum.html">Impressum</a><a href="adult-cookies.html">Cookies</a><a href="adult-jugendschutz.html">Regeln</a></footer>
+<footer class="legal"><div style="margin-bottom:7px">Rechtliche Informationen</div><button type="button" id="copyrightAdmin" style="background:none;border:0;color:inherit;padding:0;font:inherit;cursor:pointer">© Flirtly</button> · Respekt und gegenseitige Zustimmung stehen an erster Stelle.<br><a href="adult-agb.html">AGB</a><a href="adult-datenschutz.html">Datenschutz</a><a href="adult-impressum.html">Impressum</a><a href="adult-cookies.html">Cookies</a><a href="adult-jugendschutz.html">Regeln</a></footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -194,7 +194,7 @@ $("copyChat").addEventListener("click",async()=>{const text=history.map(m=>(m.ro
 (()=>{const KEY="sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c",ENDPOINT="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/flirtly-chat-test",VERSION="adult-product-0.2.0",lock=document.getElementById("flirtlyLock"),form=document.getElementById("flirtlyUnlockForm"),input=document.getElementById("flirtlyUnlockCode"),button=document.getElementById("flirtlyUnlockButton"),error=document.getElementById("flirtlyLockError");if(!lock||!form)return;
 const open=()=>{lock.classList.add("unlocked");setTimeout(()=>{lock.hidden=true;document.body.style.overflow=""},620)};
 if(sessionStorage.getItem("flirtly_access_unlocked")==="1")open();else{lock.hidden=false;document.body.style.overflow="hidden";setTimeout(()=>input.focus(),80)}
-form.addEventListener("submit",async e=>{e.preventDefault();const code=input.value.trim();if(!/^\\d{6}$/.test(code)){error.textContent="Bitte genau sechs Ziffern eingeben.";return}button.disabled=true;button.textContent="Wird geprüft …";error.textContent="";
+form.addEventListener("submit",async e=>{e.preventDefault();const code=input.value.trim();if(!/^\d{6}$/.test(code)){error.textContent="Bitte genau sechs Ziffern eingeben.";return}button.disabled=true;button.textContent="Wird geprüft …";error.textContent="";
 try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"x-flirtly-version":VERSION},body:JSON.stringify({action:"access_verify",code})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||"Code nicht gültig.");sessionStorage.setItem("flirtly_access_unlocked","1");sessionStorage.setItem("flirtly_access_name",d.name||"");open()}catch(err){error.textContent=err.message||"Prüfung fehlgeschlagen.";input.value="";input.focus()}finally{button.disabled=false;button.textContent="Herz öffnen"}});
 })();
 </script>

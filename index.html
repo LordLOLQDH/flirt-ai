@@ -121,4 +121,5 @@ try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"applica
 const adminForm=document.getElementById("flirtlyAdminUnlockForm");adminForm.addEventListener("submit",async e=>{e.preventDefault();const b=document.getElementById("flirtlyAdminUnlockButton"),err=document.getElementById("flirtlyAdminUnlockError");b.disabled=true;err.textContent="Prüfe internen Zugang …";try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"x-flirtly-version":VERSION},body:JSON.stringify({action:"admin_login",password:document.getElementById("flirtlyAdminUnlockPassword").value})});const d=await r.json();if(!r.ok||!d.ok||!d.token)throw new Error(d.error||"Anmeldung fehlgeschlagen.");sessionStorage.setItem("flirtly_admin_token",d.token);sessionStorage.setItem("flirtly_access_unlocked","1");location.href=new URL("adult.html#admin",location.href).href}catch(e){err.textContent=e.message||"Anmeldung fehlgeschlagen."}finally{b.disabled=false}});
 })();
 </script>
+<script src="./consent.js" defer></script>
 </body></html>

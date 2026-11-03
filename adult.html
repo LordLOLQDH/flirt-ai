@@ -67,6 +67,17 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 <button class="secondary" id="adminLogout" style="width:auto">Abmelden</button>
 </div>
 <p class="gate-status" id="adminPanelStatus" style="margin-top:15px">Admin-Sitzung aktiv.</p>
+<div class="notice" style="margin-top:24px">
+<h3 style="margin:0 0 12px">Zugänge verwalten</h3>
+<form id="accessCreateForm" style="display:flex;gap:9px;flex-wrap:wrap">
+<input id="accessName" maxlength="60" required placeholder="Name, z. B. Testperson" style="flex:1;min-width:170px;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px">
+<button class="primary" type="submit" id="accessCreateBtn" style="width:auto">Code erstellen</button>
+</form>
+<div id="newAccessCode" hidden style="margin-top:12px;padding:14px;border-radius:12px;background:#211627;text-align:center"><small>Neuer sechsstelliger Zugangscode</small><div id="newAccessDigits" style="font-size:32px;font-weight:800;letter-spacing:8px;margin:8px 0"></div><button type="button" class="secondary" id="copyAccessCode" style="width:auto">Code kopieren</button></div>
+<div id="accessList" style="display:grid;gap:8px;margin-top:14px"></div>
+<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:12px"><button type="button" class="secondary" id="refreshAccessList" style="width:auto">Zugänge aktualisieren</button><button type="button" class="secondary" id="testOpenAI" style="width:auto">OpenAI-Verbindung testen</button></div>
+<div class="gate-status" id="accessAdminStatus" aria-live="polite" style="margin-top:10px"></div>
+</div>
 </section>
 <section id="product">
 <div class="chat">
@@ -88,7 +99,7 @@ const confirmBox=$("adultConfirm"),verifyBtn=$("verifyBtn"),gateStatus=$("gateSt
 let ageVerified=false,sessionReady=false,busy=false,history=[],adminToken=null;
 const client=window.supabase.createClient("https://eopvkwhcgznvubesaszv.supabase.co","sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c");
 confirmBox.addEventListener("change",()=>{verifyBtn.disabled=!confirmBox.checked;gateStatus.textContent=""});
-function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display=isAdmin?"none":"block";$("adminPanel").hidden=!isAdmin;document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();if(isAdmin)refreshAdminStatus();}
+function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display=isAdmin?"none":"block";$("adminPanel").hidden=!isAdmin;document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();if(isAdmin){refreshAdminStatus();loadAccessCodes();}}
 function loadAgeVerif(){
  return new Promise((resolve,reject)=>{
   if(window.ageverif){resolve(window.ageverif);return}
@@ -136,16 +147,40 @@ $("adminForm").addEventListener("submit",async e=>{
  try{
   const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{action:"admin_login",password},headers:{"x-flirtly-version":APP_VERSION}});
   if(error)throw error;if(!data?.ok||!data?.token)throw new Error(data?.error||"Admin-Anmeldung fehlgeschlagen.");
-  adminToken=data.token;password&&($("adminPassword").value="");showProduct(true);
+  adminToken=data.token;sessionStorage.setItem("flirtly_admin_token",adminToken);password&&($("adminPassword").value="");showProduct(true);
  }catch(err){let detail=err?.message||"Admin-Anmeldung fehlgeschlagen.";try{const response=err?.context;if(response&&typeof response.json==="function"){const payload=await response.json();if(payload?.error)detail=payload.error;else if(payload?.message)detail=payload.message;}}catch{}status.textContent=detail}
  finally{btn.disabled=false}
 });
+
+async function adminAction(action,extra={}){
+ const token=adminToken||sessionStorage.getItem("flirtly_admin_token")||"";
+ const {data,error}=await client.functions.invoke("flirtly-chat-test",{body:{action,...extra},headers:{"x-flirtly-version":APP_VERSION,"x-flirtly-admin-token":token}});
+ if(error)throw error;if(!data?.ok)throw new Error(data?.error||"Aktion fehlgeschlagen.");return data;
+}
+async function loadAccessCodes(){
+ const box=$("accessList");box.textContent="Lade Zugänge …";
+ try{const d=await adminAction("access_list");box.innerHTML="";
+  if(!d.accessCodes.length){box.textContent="Noch keine Zugangscodes erstellt.";return}
+  d.accessCodes.forEach(item=>{const row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:12px";
+   const info=document.createElement("div");const name=document.createElement("strong");name.textContent=item.display_name;const meta=document.createElement("small");meta.style.cssText="display:block;color:var(--muted);margin-top:3px";meta.textContent=(item.active?"Aktiv":"Deaktiviert")+(item.last_used_at?" · zuletzt genutzt":" · noch nicht genutzt");info.append(name,meta);
+   const toggle=document.createElement("button");toggle.type="button";toggle.className="secondary";toggle.style.width="auto";toggle.textContent=item.active?"Deaktivieren":"Aktivieren";toggle.addEventListener("click",async()=>{try{await adminAction("access_toggle",{id:item.id,active:!item.active});loadAccessCodes()}catch(e){$("accessAdminStatus").textContent=e.message}});
+   row.append(info,toggle);box.append(row);
+  });
+ }catch(e){box.textContent=e.message}
+}
+$("accessCreateForm").addEventListener("submit",async e=>{e.preventDefault();const btn=$("accessCreateBtn"),status=$("accessAdminStatus");btn.disabled=true;status.textContent="Erstelle Zugang …";
+ try{const d=await adminAction("access_create",{name:$("accessName").value.trim()});$("newAccessDigits").textContent=d.code;$("newAccessCode").hidden=false;$("accessName").value="";status.textContent="Zugang wurde erstellt. Der Code wird nur jetzt angezeigt.";loadAccessCodes()}catch(err){status.textContent=err.message}finally{btn.disabled=false}
+});
+$("copyAccessCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("newAccessDigits").textContent);$("accessAdminStatus").textContent="Code kopiert."}catch{$("accessAdminStatus").textContent="Kopieren nicht verfügbar."}});
+$("refreshAccessList").addEventListener("click",loadAccessCodes);
+$("testOpenAI").addEventListener("click",async()=>{const b=$("testOpenAI"),s=$("accessAdminStatus");b.disabled=true;s.textContent="Prüfe OpenAI API …";try{const d=await adminAction("openai_test");s.textContent=d.ok?"OpenAI funktioniert. HTTP "+d.status+" · Modell "+d.model:"OpenAI-Fehler"+(d.status?" (HTTP "+d.status+")":"")+": "+d.error+(d.code?" ["+d.code+"]":"")}catch(e){s.textContent=e.message}finally{b.disabled=false}});
+
 function refreshAdminStatus(){ $("adminVersion").textContent=APP_VERSION; const s=client.auth.getSession(); s.then(({data,error})=>{$("adminSession").textContent=error?"Fehler":data.session?"Aktiv":"Nicht angemeldet"}); $("adminChatStatus").textContent=busy?"Anfrage läuft":"Bereit"; $("adminPanelStatus").textContent="Admin-Sitzung aktiv. Das Admin-Token ist zeitlich begrenzt."; }
 $("copyrightAdmin").addEventListener("click",()=>{if(adminToken){$("gate").style.display="none";$("product").style.display="none";$("adminPanel").hidden=false;document.querySelector(".tag").textContent="ADMIN-ZUGANG";refreshAdminStatus();return;} $("product").style.display="none";$("adminPanel").hidden=true;$("gate").style.display="";$("adminLogin").hidden=false;$("adminForm").scrollIntoView({behavior:"smooth",block:"center"});$("adminPassword").focus();});
 if(location.hash==="#admin") setTimeout(()=>$("copyrightAdmin").click(),120);
 $("adminBack").addEventListener("click",()=>{$("adminPanel").hidden=true;$("product").style.display="block";document.querySelector(".tag").textContent="ADMIN-ZUGANG";});
 $("adminRefresh").addEventListener("click",refreshAdminStatus);
-$("adminLogout").addEventListener("click",()=>{adminToken=null;ageVerified=false;history=[];$("adminPanel").hidden=true;$("product").style.display="none";$("gate").style.display="";$("adminLogin").hidden=true;$("adminPassword").value="";document.querySelector(".tag").textContent="NUR FÜR ERWACHSENE";$("adminStatus").textContent="Abgemeldet.";});
+$("adminLogout").addEventListener("click",()=>{adminToken=null;sessionStorage.removeItem("flirtly_admin_token");ageVerified=false;history=[];$("adminPanel").hidden=true;$("product").style.display="none";$("gate").style.display="";$("adminLogin").hidden=true;$("adminPassword").value="";document.querySelector(".tag").textContent="NUR FÜR ERWACHSENE";$("adminStatus").textContent="Abgemeldet.";});
 $("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage()});
 $("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
 $("chatInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,125)+"px"});

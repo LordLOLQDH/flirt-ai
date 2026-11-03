@@ -70,12 +70,12 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 <div class="notice" style="margin-top:24px">
 <h3 style="margin:0 0 12px">Zugänge verwalten</h3>
 <form id="accessCreateForm" style="display:flex;gap:9px;flex-wrap:wrap">
-<input id="accessName" maxlength="60" required placeholder="Name, z. B. Testperson" style="flex:1;min-width:170px;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px">
+<input id="accessName" maxlength="60" required placeholder="Name, z. B. Testperson" style="flex:1;min-width:170px;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px"><select id="accessType" style="min-width:150px;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px"><option value="adult">Flirtly 18+</option><option value="teen">Crushly Teen</option></select>
 <button class="primary" type="submit" id="accessCreateBtn" style="width:auto">Code erstellen</button>
 </form>
 <div id="newAccessCode" hidden style="margin-top:12px;padding:14px;border-radius:12px;background:#211627;text-align:center"><small>Neuer sechsstelliger Zugangscode</small><div id="newAccessDigits" style="font-size:32px;font-weight:800;letter-spacing:8px;margin:8px 0"></div><button type="button" class="secondary" id="copyAccessCode" style="width:auto">Code kopieren</button></div>
 <div id="accessList" style="display:grid;gap:8px;margin-top:14px"></div>
-<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:12px"><button type="button" class="secondary" id="refreshAccessList" style="width:auto">Zugänge aktualisieren</button><button type="button" class="secondary" id="testOpenAI" style="width:auto">OpenAI-Verbindung testen</button></div>
+<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:12px"><button type="button" class="secondary" id="refreshAccessList" style="width:auto">Zugänge aktualisieren</button></div>
 <div class="gate-status" id="accessAdminStatus" aria-live="polite" style="margin-top:10px"></div>
 </div>
 </section>
@@ -159,21 +159,22 @@ async function adminAction(action,extra={}){
 }
 async function loadAccessCodes(){
  const box=$("accessList");box.textContent="Lade Zugänge …";
+ try{const s=await adminAction("access_stats");$("accessAdminStatus").textContent="Zugänge: "+s.stats.total+" gesamt · "+s.stats.active+" aktiv · "+s.stats.adult+" 18+ · "+s.stats.teen+" Teen · "+s.stats.usedLast7Days+" in 7 Tagen genutzt."}catch{}
  try{const d=await adminAction("access_list");box.innerHTML="";
   if(!d.accessCodes.length){box.textContent="Noch keine Zugangscodes erstellt.";return}
   d.accessCodes.forEach(item=>{const row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:12px";
-   const info=document.createElement("div");const name=document.createElement("strong");name.textContent=item.display_name;const meta=document.createElement("small");meta.style.cssText="display:block;color:var(--muted);margin-top:3px";meta.textContent=(item.active?"Aktiv":"Deaktiviert")+(item.last_used_at?" · zuletzt genutzt":" · noch nicht genutzt");info.append(name,meta);
+   const info=document.createElement("div");const name=document.createElement("strong");name.textContent=item.display_name;const meta=document.createElement("small");meta.style.cssText="display:block;color:var(--muted);margin-top:3px";meta.textContent=(item.access_type==="adult"?"Flirtly 18+":"Crushly Teen")+" · "+(item.active?"Aktiv":"Deaktiviert")+(item.last_used_at?" · zuletzt genutzt":" · noch nicht genutzt");info.append(name,meta);
    const toggle=document.createElement("button");toggle.type="button";toggle.className="secondary";toggle.style.width="auto";toggle.textContent=item.active?"Deaktivieren":"Aktivieren";toggle.addEventListener("click",async()=>{try{await adminAction("access_toggle",{id:item.id,active:!item.active});loadAccessCodes()}catch(e){$("accessAdminStatus").textContent=e.message}});
    row.append(info,toggle);box.append(row);
   });
  }catch(e){box.textContent=e.message}
 }
 $("accessCreateForm").addEventListener("submit",async e=>{e.preventDefault();const btn=$("accessCreateBtn"),status=$("accessAdminStatus");btn.disabled=true;status.textContent="Erstelle Zugang …";
- try{const d=await adminAction("access_create",{name:$("accessName").value.trim()});$("newAccessDigits").textContent=d.code;$("newAccessCode").hidden=false;$("accessName").value="";status.textContent="Zugang wurde erstellt. Der Code wird nur jetzt angezeigt.";loadAccessCodes()}catch(err){status.textContent=err.message}finally{btn.disabled=false}
+ try{const d=await adminAction("access_create",{name:$("accessName").value.trim(),accessType:$("accessType").value});$("newAccessDigits").textContent=d.code;$("newAccessCode").hidden=false;$("accessName").value="";status.textContent="Zugang wurde erstellt. Der Code wird nur jetzt angezeigt.";loadAccessCodes()}catch(err){status.textContent=err.message}finally{btn.disabled=false}
 });
 $("copyAccessCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("newAccessDigits").textContent);$("accessAdminStatus").textContent="Code kopiert."}catch{$("accessAdminStatus").textContent="Kopieren nicht verfügbar."}});
 $("refreshAccessList").addEventListener("click",loadAccessCodes);
-$("testOpenAI").addEventListener("click",async()=>{const b=$("testOpenAI"),s=$("accessAdminStatus");b.disabled=true;s.textContent="Prüfe OpenAI API …";try{const d=await adminAction("openai_test");s.textContent=d.ok?"OpenAI funktioniert. HTTP "+d.status+" · Modell "+d.model:"OpenAI-Fehler"+(d.status?" (HTTP "+d.status+")":"")+": "+d.error+(d.code?" ["+d.code+"]":"")}catch(e){s.textContent=e.message}finally{b.disabled=false}});
+
 
 function refreshAdminStatus(){ $("adminVersion").textContent=APP_VERSION; const s=client.auth.getSession(); s.then(({data,error})=>{$("adminSession").textContent=error?"Fehler":data.session?"Aktiv":"Nicht angemeldet"}); $("adminChatStatus").textContent=busy?"Anfrage läuft":"Bereit"; $("adminPanelStatus").textContent="Admin-Sitzung aktiv. Das Admin-Token ist zeitlich begrenzt."; }
 $("copyrightAdmin").addEventListener("click",()=>{if(adminToken||sessionStorage.getItem("flirtly_admin_token")){adminToken=adminToken||sessionStorage.getItem("flirtly_admin_token");$("gate").style.display="none";$("product").style.display="none";$("adminPanel").hidden=false;document.querySelector(".tag").textContent="ADMIN-ZUGANG";refreshAdminStatus();return;} $("product").style.display="none";$("adminPanel").hidden=true;$("gate").style.display="";$("adminLogin").hidden=false;$("adminForm").scrollIntoView({behavior:"smooth",block:"center"});$("adminPassword").focus();});
@@ -195,7 +196,7 @@ $("copyChat").addEventListener("click",async()=>{const text=history.map(m=>(m.ro
 const background=[...document.querySelectorAll("body > *:not(#flirtlyLock)")];const open=()=>{lock.classList.add("unlocked");background.forEach(el=>el.inert=false);setTimeout(()=>{lock.hidden=true;document.body.style.overflow=""},620)};
 if(sessionStorage.getItem("flirtly_adult_access_unlocked")==="1")open();else{background.forEach(el=>el.inert=true);lock.hidden=false;document.body.style.overflow="hidden";setTimeout(()=>input.focus(),80)}
 form.addEventListener("submit",async e=>{e.preventDefault();const code=input.value.trim();if(!/^\d{6}$/.test(code)){error.textContent="Bitte genau sechs Ziffern eingeben.";return}button.disabled=true;button.textContent="Wird geprüft …";error.textContent="";
-try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"x-flirtly-version":VERSION},body:JSON.stringify({action:"access_verify",code})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||"Code nicht gültig.");sessionStorage.setItem("flirtly_adult_access_unlocked","1");sessionStorage.setItem("flirtly_access_name",d.name||"");open()}catch(err){error.textContent=err.message||"Prüfung fehlgeschlagen.";input.value="";input.focus()}finally{button.disabled=false;button.textContent="Herz öffnen"}});
+try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"x-flirtly-version":VERSION},body:JSON.stringify({action:"access_verify",code,accessType:"adult"})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||"Code nicht gültig.");sessionStorage.setItem("flirtly_adult_access_unlocked","1");sessionStorage.setItem("flirtly_access_name",d.name||"");open()}catch(err){error.textContent=err.message||"Prüfung fehlgeschlagen.";input.value="";input.focus()}finally{button.disabled=false;button.textContent="Herz öffnen"}});
 const adminForm=document.getElementById("flirtlyAdminUnlockForm");adminForm.addEventListener("submit",async e=>{e.preventDefault();const b=document.getElementById("flirtlyAdminUnlockButton"),err=document.getElementById("flirtlyAdminUnlockError");b.disabled=true;err.textContent="Prüfe Zugang …";try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"x-flirtly-version":VERSION},body:JSON.stringify({action:"admin_login",password:document.getElementById("flirtlyAdminUnlockPassword").value})});const d=await r.json();if(!r.ok||!d.ok||!d.token)throw new Error(d.error||"Anmeldung fehlgeschlagen.");sessionStorage.setItem("flirtly_admin_token",d.token);sessionStorage.setItem("flirtly_adult_access_unlocked","1");location.href=new URL("adult.html#admin",location.href).href}catch(e){err.textContent=e.message||"Anmeldung fehlgeschlagen."}finally{b.disabled=false}});
 })();
 </script>

@@ -99,7 +99,7 @@ const confirmBox=$("adultConfirm"),verifyBtn=$("verifyBtn"),gateStatus=$("gateSt
 let ageVerified=false,sessionReady=false,busy=false,history=[],adminToken=null;
 const client=window.supabase.createClient("https://eopvkwhcgznvubesaszv.supabase.co","sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c");
 confirmBox.addEventListener("change",()=>{verifyBtn.disabled=!confirmBox.checked;gateStatus.textContent=""});
-function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display=isAdmin?"none":"block";$("adminPanel").hidden=!isAdmin;document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();if(isAdmin){refreshAdminStatus();loadAccessCodes();}}
+function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display=isAdmin?"none":"block";$("adminPanel").hidden=!isAdmin;const accessName=sessionStorage.getItem("flirtly_access_name")||"Gast";document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":("ANGEMELDET ALS · "+accessName);startSession();if(isAdmin){refreshAdminStatus();loadAccessCodes();}}
 function loadAgeVerif(){
  return new Promise((resolve,reject)=>{
   if(window.ageverif){resolve(window.ageverif);return}

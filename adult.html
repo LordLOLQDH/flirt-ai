@@ -30,16 +30,29 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 <label class="checkline"><input type="checkbox" id="adultConfirm"><span>Ich bestätige, dass ich mindestens 18 Jahre alt bin und die Regeln sowie Datenschutzhinweise gelesen habe.</span></label>
 <button class="primary" id="verifyBtn" disabled>Bestätigen und Alter prüfen&nbsp; →</button>
 <div class="gate-status" id="gateStatus" aria-live="polite"></div>
-<div style="margin:24px 0 12px;border-top:1px solid var(--line)"></div>
-<details>
-<summary style="cursor:pointer;color:#d8b7e2;font-size:13px;font-weight:700">Admin-Zugang</summary>
-<p class="lead" style="font-size:12px;margin:12px 0">Nur für Administration. Das Passwort wird serverseitig bei Supabase geprüft.</p>
+<div id="adminLogin" hidden style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">
+<p class="lead" style="font-size:12px;margin:0 0 12px">Geschützter Administrationszugang.</p>
 <form id="adminForm" style="display:grid;gap:9px">
-<input id="adminPassword" type="password" autocomplete="current-password" placeholder="Admin-Code" aria-label="Admin-Code" required style="width:100%;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px">
-<button class="secondary" id="adminLoginBtn" type="submit">Admin-Zugang prüfen</button>
+<input id="adminPassword" type="password" autocomplete="current-password" placeholder="Admin-Passwort" aria-label="Admin-Passwort" required style="width:100%;background:#211627;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px">
+<button class="secondary" id="adminLoginBtn" type="submit">Anmelden</button>
 <div class="gate-status" id="adminStatus" aria-live="polite"></div>
 </form>
-</details>
+</div>
+</section>
+<section id="adminPanel" hidden style="padding:clamp(20px,4vw,34px)">
+<div class="eyebrow">Flirtly · Administration</div><h2 style="font-size:clamp(28px,6vw,38px);margin:10px 0">Admin-Konsole</h2>
+<p class="lead">Interner Überblick über diese Sitzung und die Anwendung.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:22px 0">
+<div class="notice" style="margin:0"><strong>Produktversion</strong><br><span id="adminVersion">–</span></div>
+<div class="notice" style="margin:0"><strong>Supabase-Sitzung</strong><br><span id="adminSession">Wird geprüft …</span></div>
+<div class="notice" style="margin:0"><strong>Chatstatus</strong><br><span id="adminChatStatus">Bereit</span></div>
+</div>
+<div style="display:flex;gap:9px;flex-wrap:wrap">
+<button class="primary" id="adminBack" style="width:auto">Zum Chat</button>
+<button class="secondary" id="adminRefresh" style="width:auto">Status aktualisieren</button>
+<button class="secondary" id="adminLogout" style="width:auto">Abmelden</button>
+</div>
+<p class="gate-status" id="adminPanelStatus" style="margin-top:15px">Admin-Sitzung aktiv.</p>
 </section>
 <section id="product">
 <div class="chat">
@@ -50,18 +63,18 @@ button,input,textarea{font:inherit}button{cursor:pointer}
 </div>
 </section>
 </main>
-<footer class="legal">Flirtly 18+ · Respekt und gegenseitige Zustimmung stehen an erster Stelle.<br><a href="adult-agb.html">AGB</a><a href="adult-datenschutz.html">Datenschutz</a><a href="adult-impressum.html">Impressum</a><a href="adult-cookies.html">Cookies</a><a href="adult-jugendschutz.html">Regeln</a></footer>
+<footer class="legal"><button type="button" id="copyrightAdmin" style="background:none;border:0;color:inherit;padding:0;font:inherit;cursor:pointer">© Flirtly 18+</button> · Respekt und gegenseitige Zustimmung stehen an erster Stelle.<br><a href="adult-agb.html">AGB</a><a href="adult-datenschutz.html">Datenschutz</a><a href="adult-impressum.html">Impressum</a><a href="adult-cookies.html">Cookies</a><a href="adult-jugendschutz.html">Regeln</a></footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="adult-product-0.1.3";
+const APP_VERSION="adult-product-0.2.0";
 const AGEVERIF_KEY="vLzafhEevJXWUOPX6rrzQBGjrpmUNNfmGMxbetXY";
 const $=id=>document.getElementById(id);
 const confirmBox=$("adultConfirm"),verifyBtn=$("verifyBtn"),gateStatus=$("gateStatus");
 let ageVerified=false,sessionReady=false,busy=false,history=[],adminToken=null;
 const client=window.supabase.createClient("https://eopvkwhcgznvubesaszv.supabase.co","sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c");
 confirmBox.addEventListener("change",()=>{verifyBtn.disabled=!confirmBox.checked;gateStatus.textContent=""});
-function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display="block";document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();}
+function showProduct(isAdmin=false){ageVerified=true;$("gate").style.display="none";$("product").style.display=isAdmin?"none":"block";$("adminPanel").hidden=!isAdmin;document.querySelector(".tag").textContent=isAdmin?"ADMIN-ZUGANG":"VERIFIZIERT · 18+";startSession();if(isAdmin)refreshAdminStatus();}
 function loadAgeVerif(){
  return new Promise((resolve,reject)=>{
   if(window.ageverif){resolve(window.ageverif);return}
@@ -113,6 +126,11 @@ $("adminForm").addEventListener("submit",async e=>{
  }catch(err){let detail=err?.message||"Admin-Anmeldung fehlgeschlagen.";try{const response=err?.context;if(response&&typeof response.json==="function"){const payload=await response.json();if(payload?.error)detail=payload.error;else if(payload?.message)detail=payload.message;}}catch{}status.textContent=detail}
  finally{btn.disabled=false}
 });
+function refreshAdminStatus(){ $("adminVersion").textContent=APP_VERSION; const s=client.auth.getSession(); s.then(({data,error})=>{$("adminSession").textContent=error?"Fehler":data.session?"Aktiv":"Nicht angemeldet"}); $("adminChatStatus").textContent=busy?"Anfrage läuft":"Bereit"; $("adminPanelStatus").textContent="Admin-Sitzung aktiv. Das Admin-Token ist zeitlich begrenzt."; }
+$("copyrightAdmin").addEventListener("click",()=>{if(adminToken){$("gate").style.display="";$("adminLogin").hidden=false;$("adminForm").scrollIntoView({behavior:"smooth",block:"center"});return;} $("adminLogin").hidden=false;$("adminForm").scrollIntoView({behavior:"smooth",block:"center"});$("adminPassword").focus();});
+$("adminBack").addEventListener("click",()=>{$("adminPanel").hidden=true;$("product").style.display="block";document.querySelector(".tag").textContent="ADMIN-ZUGANG";});
+$("adminRefresh").addEventListener("click",refreshAdminStatus);
+$("adminLogout").addEventListener("click",()=>{adminToken=null;ageVerified=false;history=[];$("adminPanel").hidden=true;$("product").style.display="none";$("gate").style.display="";$("adminLogin").hidden=true;$("adminPassword").value="";document.querySelector(".tag").textContent="NUR FÜR ERWACHSENE";$("adminStatus").textContent="Abgemeldet.";});
 $("chatForm").addEventListener("submit",e=>{e.preventDefault();sendMessage()});
 $("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
 $("chatInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,125)+"px"});
